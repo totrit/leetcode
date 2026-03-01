@@ -11,33 +11,34 @@ class Solution {
             }
             list.add(times[i][1] to times[i][2])
         }
-        val toVisit = HashSet(IntArray(n) { it + 1 }.toList())
+        val minDists = IntArray(n+1) { Int.MAX_VALUE }
 
         val pq = PriorityQueue<Pair<Int, Int>>(n) { a, b -> a.first - b.first }
         pq.add(0 to k)
         var dist = 0
+        var toVisit = n
         while(pq.isNotEmpty()) {
             val popped = pq.remove()
             val node = popped.second
             val delay = popped.first
-            if (toVisit.contains(node)) {
-                toVisit.remove(node)
-                if (toVisit.isEmpty()) {
-                    dist = delay
-                    break
-                }
-            } else {
+            if (delay >= minDists[node]) {
                 continue
+            } else {
+                minDists[node] = delay
             }
+            toVisit --
             dist = delay
+            if (toVisit == 0) {
+                break
+            }
             edges[node]?.let {
                 for ((nextNode, delay) in it) {
-                    if (toVisit.contains(nextNode)) {
+                    if (dist + delay < minDists[nextNode]) {
                         pq.add(dist + delay to nextNode)
                     }
                 }
             }
         }
-        return if (toVisit.isEmpty()) dist else -1
+        return if (toVisit == 0) dist else -1
     }
 }
